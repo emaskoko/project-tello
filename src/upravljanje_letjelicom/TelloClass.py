@@ -152,7 +152,7 @@ class TelloClass:
             out.release()
             cv2.destroyAllWindows()  
 
-    #osbsolite!!!  
+    #obsolite!!!  
     def __update_position__(self, x, y):
 
         if(x != 0):
