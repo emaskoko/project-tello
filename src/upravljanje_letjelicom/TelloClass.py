@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from time import sleep 
 import time
 import math
+import torch
 import threading
 
 
@@ -192,3 +193,45 @@ class TelloClass:
             print('Invalid direction!!!')
 
         sleep(2)
+
+    def detect_packages(self, model_path='yolov5s.pt', confidence_threshold=0.5):
+        """
+        Detect and count packages using YOLO from the video stream.
+        """
+        # Load YOLO model
+        model = torch.hub.load('ultralytics/yolov5', 'custom', path=model_path)
+        model.conf = confidence_threshold  # Set confidence threshold
+
+        self._tello.streamon()
+        print("Package detection started. Press 'q' to stop.")
+
+        try:
+            while True:
+                frame = self._tello.get_frame_read().frame  # Get current frame
+                results = model(frame)  # Perform YOLO detection
+
+                # Parse YOLO results
+                detections = results.pandas().xyxy[0]  # Pandas DataFrame of detections
+                packages = detections[detections['name'] == 'package']  # Filter for "package" label
+
+                # Draw bounding boxes on the frame
+                for _, row in packages.iterrows():
+                    x1, y1, x2, y2, conf = row[['xmin', 'ymin', 'xmax', 'ymax', 'confidence']]
+                    cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
+                    cv2.putText(frame, f"Package: {conf:.2f}", (int(x1), int(y1) - 10),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+
+                # Display the frame
+                cv2.imshow('Package Detection', frame)
+
+                # Count packages
+                num_packages = len(packages)
+                print(f"Detected packages: {num_packages}")
+
+                # Exit on 'q'
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    break
+        finally:
+            self._tello.streamoff()
+            cv2.destroyAllWindows()
+            print("Package detection stopped.")

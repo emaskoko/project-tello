@@ -1,6 +1,6 @@
 import sys
 sys.path.append('../')
-from TelloClass import TelloClass
+from upravljanje_letjelicom.TelloClass import TelloClass
 from time import sleep
 
 DISTANCE = 150      #distance from shelf in [cm]
@@ -28,6 +28,8 @@ if __name__ == '__main__':
                 tello_class._tello.move_down(HEIGHT - 2 * MARGIN)
             sleep(2)
             tello_class._tello.move_right(COL_WIDTH)
+
+        tello_class.detect_packages(model_path='yolov5s.pt')    
     except KeyboardInterrupt:
         print('Aborting...\nDrone is landing...')
     finally:
