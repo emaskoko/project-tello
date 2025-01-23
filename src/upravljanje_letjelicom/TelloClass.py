@@ -7,7 +7,6 @@ import math
 import torch
 import threading
 
-
 class TelloClass:
     def __init__(self):
 
@@ -60,10 +59,6 @@ class TelloClass:
             self.z_positions.append(round(new_z, 2))
             self.t_moments.append(time.time() - initial_time)
         
-    
-    
-    
-        
     def draw_graph(self):
         sleep(1)
         
@@ -82,9 +77,7 @@ class TelloClass:
             plt.title(f'Kretanje {axis} pozicije')
             plt.xlabel('Vrijeme[s]')
             plt.ylabel(f'{axis} pozicija[cm]')
-            
-            
-
+        
         def draw_3d_graph():
             fig = plt.figure()
             ax = fig.add_subplot(111, projection='3d')  # Kreiraj 3D os
@@ -152,48 +145,7 @@ class TelloClass:
             print("Video thread završio.")
             out.release()
             cv2.destroyAllWindows()  
-
-    #obsolite!!!  
-    def __update_position__(self, x, y):
-
-        if(x != 0):
-            new_x = self.x_positions[-1] + x * math.cos(math.radians(self.c_get_yaw()))
-            new_y = self.y_positions[-1] + x * math.sin(math.radians(self.c_get_yaw()))
-        else:
-            new_x = self.x_positions[-1] + y * math.sin(math.radians(self.c_get_yaw()))
-            new_y = self.y_positions[-1] + y * math.cos(math.radians(self.c_get_yaw()))
-        new_z = self._tello.get_height()
-
-        self.x_positions.append(round(new_x, 2))
-        self.y_positions.append(round(new_y, 2))
-        self.z_positions.append(round(new_z, 2))  
-
-    #obsolite!!!
-    def c_move(self, distance: int, direction: str):
-        if(direction == 'up'):
-            self._tello.move_up(distance)
-            self.__update_position__(0, 0)
-        elif(direction == 'down'):
-            self._tello.move_down(distance)
-            self.__update_position__(0, 0)
-        elif(direction == 'right'):
-            self._tello.move_right(distance)
-            self.__update_position__(0, -distance)
-        elif(direction == 'left'):
-            self._tello.move_left(distance)
-            self.__update_position__(0, distance)
-        elif(direction == 'forward'):
-            self._tello.move_forward(distance)
-            self.__update_position__(distance, 0)
-        elif(direction == 'back'):
-            self._tello.move_back(distance)
-            self.__update_position__(-distance, 0)
-        else:  #Error!!!
-            self._tello.land()
-            print('Invalid direction!!!')
-
-        sleep(2)
-
+   
     def detect_packages(self, model_path='yolov5s.pt', confidence_threshold=0.5):
         """
         Detect and count packages using YOLO from the video stream.
