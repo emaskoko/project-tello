@@ -5,8 +5,8 @@ from PIL import Image
 import PIL
 
 def my_sink(result, video_frame):
-    if result.get("output_image"):  # Provera da li postoji slika u rezultatu
-        output_image = result["output_image"].numpy_image  # Dobijamo numpy array
+    if result.get("output_image"):  # Provjera da li postoji slika u rezultatu
+        output_image = result["output_image"].numpy_image  # Numpy array
 
         if output_image is not None:
             # Prikaz slike
@@ -16,7 +16,7 @@ def my_sink(result, video_frame):
             # Čuvanje slike u output.jpg
             cv2.imwrite("output.jpg", output_image)
 
-    print(result)  # Prikaz rezultat
+    print(result)  # Prikaz rezultata u terminalu
     
 
 # initialize a pipeline object
