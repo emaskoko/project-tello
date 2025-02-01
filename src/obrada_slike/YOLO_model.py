@@ -24,7 +24,7 @@ pipeline = InferencePipeline.init_with_workflow(
     api_key="68uomVMA1kKCZEGjK0y4",
     workspace_name="projekt-r",
     workflow_id="detect-count-and-visualize-3",
-    video_reference="vid5.mp4", # Path to video, device id (int, usually 0 for built in webcams), or RTSP stream url
+    video_reference=0, # Path to video, device id (int, usually 0 for built in webcams), or RTSP stream url
     max_fps=30,
     on_prediction=my_sink
 )
