@@ -3,7 +3,11 @@ from inference import InferencePipeline
 import cv2
 from PIL import Image 
 import PIL
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
+API_KEY = os.getenv("API_KEY")
 def my_sink(result, video_frame):
     if result.get("output_image"):  # Provjera da li postoji slika u rezultatu
         output_image = result["output_image"].numpy_image  # Numpy array
@@ -21,7 +25,7 @@ def my_sink(result, video_frame):
 
 # initialize a pipeline object
 pipeline = InferencePipeline.init_with_workflow(
-    api_key="68uomVMA1kKCZEGjK0y4",
+    api_key=API_KEY,
     workspace_name="projekt-r",
     workflow_id="detect-count-and-visualize-3",
     video_reference=0, # Path to video, device id (int, usually 0 for built in webcams), or RTSP stream url
