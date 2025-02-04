@@ -4,48 +4,61 @@ from djitellopy import Tello
 import cv2
 from PIL import Image, ImageTk
 import threading
-
-tello = Tello()
+from time import sleep 
+import sys
+from TelloClass import TelloClass
+from movements.shelf import shelf_scan, tello_class 
+from yolo_model import yolo_count
 
 frame = None
 running = False
 package_count = 0
+shelf_width = 0
+shelf_height = 0
 
 # Function to start the drone and video feed
 def start_drone():
     global running
     running = True
-    tello.connect()
-    tello.streamon()
-    update_video_feed()
+    print(f'width = {shelf_width}\nheight = {shelf_height}')
+    shelf_scan(shelf_width, shelf_height)
+    # update_video_feed()
+    running = False
+    sleep(1)
+    yolo_count('./proba_video.avi')
+
 
 # Function to stop the drone and video feed
 def stop_drone():
     global running
+    tello_class._tello.land()
+    running = tello_class._tello.is_flying
     running = False
-    tello.streamoff()
-    tello.land()
+
+
 
 # Function to update the video feed
-def update_video_feed():
-    global frame, running, package_count
+# def update_video_feed():
+#     global frame, running, package_count
 
-    if running:
-        frame = tello.get_frame_read().frame
+#     if running:
+#         frame = tello_class._tello.get_frame_read().frame
 
-        # Simulate package counting logic (replace with actual detection)
-        package_count = 5
+#         # Simulate package counting logic (replace with actual detection)
+#         package_count = 5
 
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        img = Image.fromarray(frame)
-        img_tk = ImageTk.PhotoImage(image=img)
+#         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+#         img = Image.fromarray(frame)
+#         img_tk = ImageTk.PhotoImage(image=img)
 
-        video_label.img_tk = img_tk
-        video_label.configure(image=img_tk)
+#         video_label.img_tk = img_tk
+#         video_label.configure(image=img_tk)
 
-        package_counter_label.config(text=f"Packages Detected: {package_count}")
+#         package_counter_label.config(text=f"Packages Detected: {package_count}")
 
-        video_label.after(10, update_video_feed)
+#         video_label.after(10, update_video_feed)
+
+
 
 # Function to handle Start button click
 def on_start():
@@ -57,14 +70,15 @@ def on_stop():
 
 # Function to handle Shelf Dimensions submission
 def submit_dimensions():
-    width = shelf_width.get()
-    height = shelf_height.get()
-    print(f"Shelf Dimensions: {width}x{height}")  # Use these dimensions as needed
+    global shelf_width, shelf_height
+    shelf_width = int(shelf_width.get())
+    shelf_height = int(shelf_height.get())
+    print(f"Shelf Dimensions: {shelf_width}x{shelf_height}")  # Use these dimensions as needed
 
 # Create the main Tkinter window
 root = tk.Tk()
 root.title("Drone Package Counter")
-root.geometry("600x500")
+root.geometry("700x400")
 root.configure(bg="#f0f0f0")  # Light gray background
 
 # Create a custom style
@@ -109,15 +123,15 @@ submit_button = ttk.Button(dimensions_frame, text="Submit", command=submit_dimen
 submit_button.grid(row=2, columnspan=2, pady=10)
 
 # Live video feed display
-video_frame = tk.Frame(root, bg="#e0e0e0", relief="groove", borderwidth=2)
-video_frame.pack(pady=10)
+# video_frame = tk.Frame(root, bg="#e0e0e0", relief="groove", borderwidth=2)
+# video_frame.pack(pady=10)
 
-video_label = tk.Label(video_frame, bg="#000", width=60, height=20)
-video_label.pack()
+# video_label = tk.Label(video_frame, bg="#000", width=60, height=20)
+# video_label.pack()
 
 # Package counter display
-package_counter_label = tk.Label(root, text="Packages Detected: 0", font=("Arial", 16), bg="#f0f0f0", fg="#333")
-package_counter_label.pack(pady=10)
+# package_counter_label = tk.Label(root, text="Packages Detected: 0", font=("Arial", 16), bg="#f0f0f0", fg="#333")
+# package_counter_label.pack(pady=10)
 
 # Run the Tkinter main loop
 root.mainloop()
